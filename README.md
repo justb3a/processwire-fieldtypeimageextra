@@ -28,7 +28,7 @@ git clone https://github.com/justonestep/processwire-fieldtypeimageextra.git you
 4. Save.
 5. Add your new field to one or more Templates.
 
-## access the value
+## Accessing the value
 
 This is no different than accessing the value of any other field.
 

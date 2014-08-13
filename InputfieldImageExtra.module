@@ -24,6 +24,7 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
 
   /**
    * @field array Default config values
+   *
    */
   protected static $defaults = array(
     'orientationField' => true,
@@ -75,9 +76,9 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
         'columnWidth' => 25
       ),
       'orientationValues' => array(
-				'type' => 'InputfieldText',
-				'description' => 'Values for Image Orientation Select Field' . PHP_EOL . '(comma-separated list)',
-				'size' => 45,
+      'type' => 'InputfieldText',
+      'description' => 'Values for Image Orientation Select Field' . PHP_EOL . '(comma-separated list)',
+      'size' => 45,
         'placeholder' => 'left,right',
         'columnWidth' => 25
       ),
@@ -120,22 +121,26 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
     return $fields;
   }
 
-	/**
-	 * customfields array , that we use to hold our submitted customfields
-	 *
-	 */
+  /**
+   * customfields array , that we use to hold our submitted customfields
+   *
+   */
   protected $customFields = array();
 
-	/**
-	 * init
-	 *
-	 */
+  /**
+   * init
+   *
+   */
   public function init() {
     parent::init();
   }
 
   /**
    * addCustomField - add custom field
+   *
+   * @param string $type
+   * @param string $name
+   * @param string $label
    */
   public function addCustomField($type, $name, $label) {
     $this->customFields[] = array(
@@ -147,6 +152,7 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
 
   /**
    * render - add respectively css and js
+   *
    */
   public function ___render() {
     foreach (array('InputfieldFile', 'InputfieldImage') as $item) {
@@ -160,6 +166,10 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
 
   /**
    * renderItemDescriptionField - build html structure for the backend
+   *
+   * @param Pagefile $pagefile
+   * @param string $id
+   * @param int $n
    */
   protected function renderItemDescriptionField(Pagefile $pagefile, $id, $n) {
     $out = '';
@@ -218,6 +228,10 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
 
   /**
    * processInputFile - check changed values
+   *
+   * @param WireInputData $input
+   * @param Pagefile $pagefile
+   * @param int $n
    */
   protected function ___processInputFile(WireInputData $input, Pagefile $pagefile, $n) {
     $changed = parent::___processInputFile($input, $pagefile, $n);

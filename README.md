@@ -18,7 +18,27 @@ git clone https://github.com/justonestep/processwire-fieldtypeimageextra.git you
 2. Login to ProcessWire admin and click Modules. 
 3. Click "Check for new modules".
 4. Click "install" next to the new FieldtypeImageExtra module. 
-5. That's all - no settings are required. 
+5. That's all - no settings are required but possiblea. 
+
+### You do not need all custom fields?
+
+The following fields are available:
+
+* orientation - image orientation
+* orientation values - values to use as classnames or identifiers for different image orientations
+* title - image title to use for title/alt tag or/and caption, if empty, the content will be generated from the applications filename
+* description - image description
+* link - image link to internal pages
+
+If you don't need all custom fields, you can easily disable them:
+
+1. Login to ProcessWire admin and click Modules.
+2. Open `Images Extra Inputfield` Settings.
+3. Just disable the desired fields.
+
+The only exception is `orientationValues`.
+Here you can insert identifiers for classnames or similar separated by comma.
+This values will be available in a dropdown list.
 
 ## Usage
 
@@ -43,3 +63,13 @@ For use with [TemplateTwigReplace](http://modules.processwire.com/modules/templa
 	{{image.title}}
 	{{pages.get(image.link).url}}
 ```
+
+## Screenshots
+
+**Module `Images Extra Inputfield` Settings**
+
+![screenshot](screens/settings.png)
+
+**Field Image Extra**
+
+![screenshot](screens/field.png)

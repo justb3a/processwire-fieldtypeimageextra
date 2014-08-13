@@ -22,180 +22,204 @@
  */
 class FieldtypeImageExtra extends FieldtypeImage {
 
-	protected $dbFields = array(); // cache
+  /**
+   * dbFields array // cache
+   *
+   */
+  protected $dbFields = array();
 
-	public static function getModuleInfo() {
-		return array(
-			'title' => 'Images Extra Fieldtype',
-			'version' => 100,
-			'summary' => 'Field that stores one or more GIF, JPG, or PNG images',
-		);
-	}
+  /**
+   * Retrieves module meta data
+   * Implementation of the Module interface
+   *
+   * @return array
+   * @see http://processwire.com/apigen/class-Module.html
+   */
+  public static function getModuleInfo() {
+    return array(
+      'title' => 'Images Extra Fieldtype',
+      'version' => 100,
+      'summary' => 'Field that stores one or more GIF, JPG, or PNG images',
+      'href' => 'https://github.com/justonestep/processwire-fieldtypeimageextra',
+    );
+  }
 
-	public function init() {
-		$this->defaultInputfieldClass = 'InputfieldImageExtra';
-	}
+  /**
+   * init
+   *
+   */
+  public function init() {
+    $this->defaultInputfieldClass = 'InputfieldImageExtra';
+  }
 
-	/**
-	 * Return the DB schema used by this field's table
-	 *
-	 */
-	public function getDatabaseSchema(Field $field) {
-		$schema = parent::getDatabaseSchema($field);
-		unset($schema['description']);
-		$schema['data'] = 'varchar(255) NOT NULL';
-		$schema['title'] = "varchar(1024) NOT NULL";
-		$schema['description'] = "text NOT NULL";
-		$schema['orientation'] = "varchar(255) NOT NULL";
-		$schema['link'] = 'int(11) NOT NULL';
-		$schema['keys']['title'] = 'FULLTEXT KEY title (title)';
-		$schema['keys']['description'] = 'FULLTEXT KEY description (description)';
-		$schema['keys']['orientation'] = 'FULLTEXT KEY orientation (orientation)';
+  /**
+   * Return the DB schema used by this field's table
+   *
+   * @param Field $field
+   */
+  public function getDatabaseSchema(Field $field) {
+    $schema = parent::getDatabaseSchema($field);
+    unset($schema['description']);
+    $schema['data'] = 'varchar(255) NOT NULL';
+    $schema['title'] = "varchar(1024) NOT NULL";
+    $schema['description'] = "text NOT NULL";
+    $schema['orientation'] = "varchar(255) NOT NULL";
+    $schema['link'] = 'int(11) NOT NULL';
+    $schema['keys']['title'] = 'FULLTEXT KEY title (title)';
+    $schema['keys']['description'] = 'FULLTEXT KEY description (description)';
+    $schema['keys']['orientation'] = 'FULLTEXT KEY orientation (orientation)';
 
-		return $schema;
-	}
+    return $schema;
+  }
 
-        /**
-         * Perform output formatting on the value delivered to the API
-         *
-         * Entity encode the file's description field.
-         *
-         * If the maxFiles setting is 1, then we format the value to dereference as single Pagefile rather than a PagefilesArray
-         *
-         * This methos is only used when $page->outputFormatting is true.
-         *
-         */
-        public function formatValue(Page $page, Field $field, $value) {
-			if (!$value instanceof Pagefiles) return $value;
+  /**
+   * Perform output formatting on the value delivered to the API
+   * Entity encode the file's description field.
+   * If the maxFiles setting is 1, then we format the value to dereference as single Pagefile rather than a PagefilesArray
+   * This methos is only used when $page->outputFormatting is true.
+   *
+   * @param Page $page
+   * @param Field $field
+   * @param string|int|array $value
+   */
+  public function formatValue(Page $page, Field $field, $value) {
+    if (!$value instanceof Pagefiles) return $value;
 
-			// make sure fields are formatted for output
-			if ($field->entityEncode) {
-				$dbFields = $this->getDatabaseFields($field);
+    // make sure fields are formatted for output
+    if ($field->entityEncode) {
+      $dbFields = $this->getDatabaseFields($field);
 
-				foreach($value as $k => $v) {
-					foreach($dbFields as $name => $type) {
-						$v->set($name, htmlspecialchars($v->$name, ENT_QUOTES, "UTF-8"));
-					}
-				}
-			}
-
-			// if field is configured to only hold one file, then make it be just that file
-			// rather than an Pageimages array
-			if ($field->maxFiles == 1) {
-			if (count($value)) $value = $value->first();
-				else $value = null;
-			}
-
-			return $value;
+      foreach($value as $k => $v) {
+        foreach($dbFields as $name => $type) {
+          $v->set($name, htmlspecialchars($v->$name, ENT_QUOTES, "UTF-8"));
         }
+      }
+    }
+
+    // if field is configured to only hold one file, then make it be just that file
+    // rather than an Pageimages array
+    if ($field->maxFiles == 1) {
+      if (count($value)) $value = $value->first();
+        else $value = null;
+    }
+
+    return $value;
+  }
 
 
-	/**
-	 * Given a raw value (value as stored in DB), return the value as it would appear in a Page object
-	 *
-	 * @param Page $page
-	 * @param Field $field
-	 * @param string|int|array $value
-	 * @return string|int|array|object $value
-	 *
-	 */
-	public function ___wakeupValue(Page $page, Field $field, $value) {
-		$pagefiles = parent::___wakeupValue($page, $field, $value);
-		$dbFields = $this->getDatabaseFields($field);
+  /**
+   * Given a raw value (value as stored in DB), return the value as it would appear in a Page object
+   *
+   * @param Page $page
+   * @param Field $field
+   * @param string|int|array $value
+   * @return string|int|array|object $value
+   *
+   */
+  public function ___wakeupValue(Page $page, Field $field, $value) {
+    $pagefiles = parent::___wakeupValue($page, $field, $value);
+    $dbFields = $this->getDatabaseFields($field);
 
-		foreach($pagefiles as $pagefile) {
-			foreach($value as $v) {
-				if($v['data'] != $pagefile->basename) continue;
-				foreach($dbFields as $name => $type) {
-					$pagefile->set($name, $v[$name]);
+    foreach($pagefiles as $pagefile) {
+      foreach($value as $v) {
+        if($v['data'] != $pagefile->basename) continue;
+        foreach($dbFields as $name => $type) {
+          $pagefile->set($name, $v[$name]);
 
-					// fill title by default if empty
-					if ($name === 'title' && empty($v[$name])) {
-						$defaultTitle = basename($pagefile->basename, '.' . $pagefile->ext());
-						$pagefile->set($name, $defaultTitle);
-					}
-				}
-			}
-		}
+          // fill title by default if empty
+          if ($name === 'title' && empty($v[$name])) {
+            $defaultTitle = basename($pagefile->basename, '.' . $pagefile->ext());
+            $pagefile->set($name, $defaultTitle);
+          }
+        }
+      }
+    }
 
-		$pagefiles->resetTrackChanges(true);
+    $pagefiles->resetTrackChanges(true);
 
-		return $pagefiles;
-	}
+    return $pagefiles;
+  }
 
-	/**
-	 * Given an 'awake' value, as set by wakeupValue, convert the value back to a basic type for storage in DB.
-	 *
-	 * @param Page $page
-	 * @param Field $field
-	 * @param string|int|array|object $value
-	 * @return string|int
-	 *
-	 */
-	public function ___sleepValue(Page $page, Field $field, $value) {
-		$sleepValue = array();
-		if(!$value instanceof Pagefiles) return $sleepValue;
-		$dbFields = $this->getDatabaseFields($field);
-		foreach($value as $pagefile) {
-			$v = array('data' => $pagefile->basename);
-			foreach($dbFields as $name => $type) {
-				$this->message($name . ": " .  $pagefile->$name);
-				$v[$name] = $pagefile->$name;
-			}
+  /**
+   * Given an 'awake' value, as set by wakeupValue, convert the value back to a basic type for storage in DB.
+   *
+   * @param Page $page
+   * @param Field $field
+   * @param string|int|array|object $value
+   * @return string|int
+   *
+   */
+  public function ___sleepValue(Page $page, Field $field, $value) {
+    $sleepValue = array();
+    if(!$value instanceof Pagefiles) return $sleepValue;
+    $dbFields = $this->getDatabaseFields($field);
+    foreach($value as $pagefile) {
+      $v = array('data' => $pagefile->basename);
+      foreach($dbFields as $name => $type) {
+        $this->message($name . ": " .  $pagefile->$name);
+        $v[$name] = $pagefile->$name;
+      }
 
-			$sleepValue[] = $v;
-		}
-		return $sleepValue;
-	}
+      $sleepValue[] = $v;
+    }
 
-	/**
-	 * Return array of 'name' => 'type'
-	 *
-	 */
-	public function getDatabaseFields(Field $field) {
-		// check cache and return it if there
-		if(!empty($this->dbFields[$field->name])) return $this->dbFields[$field->name];
+    return $sleepValue;
+  }
 
-		$dbFields = array();
-		$schema = $this->getDatabaseSchema($field);
+  /**
+   * Return array of 'name' => 'type'
+   *
+   * @param Field $field
+   */
+  public function getDatabaseFields(Field $field) {
+    // check cache and return it if there
+    if(!empty($this->dbFields[$field->name])) return $this->dbFields[$field->name];
 
-		foreach($schema as $name => $value) {
-			// skip the native fields, leaving ony the custom ones
-			if (in_array($name, array('pages_id', 'data', 'sort', 'keys'))) continue;
+    $dbFields = array();
+    $schema = $this->getDatabaseSchema($field);
 
-			if (stripos($value, 'text ') === 0) $type = 'textarea';
-				else if(stripos($value, 'varchar') === 0) $type = 'text';
-				else if(stripos($value, 'int') === 0) $type = 'int';
-				else continue; // skip over any we don't support
+    foreach($schema as $name => $value) {
+      // skip the native fields, leaving ony the custom ones
+      if (in_array($name, array('pages_id', 'data', 'sort', 'keys'))) continue;
 
-			$dbFields[$name] = $type;
-		}
+      if (stripos($value, 'text ') === 0) $type = 'textarea';
+        else if(stripos($value, 'varchar') === 0) $type = 'text';
+        else if(stripos($value, 'int') === 0) $type = 'int';
+        else continue; // skip over any we don't support
 
-		$this->dbFields[$field->name] = $dbFields;
+      $dbFields[$name] = $type;
+    }
 
-		return $dbFields;
-	}
+    $this->dbFields[$field->name] = $dbFields;
 
-	/**
-	 * Return the Inputfield that handles this Fieldtype's admin input
-	 *
-	 */
-	public function getInputfield(Page $page, Field $field) {
-		$inputfield = parent::getInputfield($page, $field);
+    return $dbFields;
+  }
 
-		if ($inputfield instanceof InputfieldImageExtra) {
-			$dbFields = $this->getDatabaseFields($field);
-			foreach($dbFields as $name => $type) {
-				$inputfield->addCustomField($type, $name, ucfirst($name));
-			}
-		}
+  /**
+   * Return the Inputfield that handles this Fieldtype's admin input
+   *
+   * @param Page $page
+   * @param Field $field
+   */
+  public function getInputfield(Page $page, Field $field) {
+    $inputfield = parent::getInputfield($page, $field);
 
-		return $inputfield;
-	}
+    if ($inputfield instanceof InputfieldImageExtra) {
+      $dbFields = $this->getDatabaseFields($field);
+      foreach($dbFields as $name => $type) {
+        $inputfield->addCustomField($type, $name, ucfirst($name));
+      }
+    }
 
-	public function ___install() {
-		$this->modules->get("InputfieldImageExtra");
-	}
+    return $inputfield;
+  }
+
+  /**
+   * install - install module InputfieldImageExtra as well
+   *
+   */
+  public function ___install() {
+    $this->modules->get("InputfieldImageExtra");
+  }
 
 }
-

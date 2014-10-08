@@ -61,15 +61,55 @@ class FieldtypeImageExtra extends FieldtypeImage {
     $schema = parent::getDatabaseSchema($field);
     unset($schema['description']);
     $schema['data'] = 'varchar(255) NOT NULL';
-    $schema['title'] = "varchar(1024) NOT NULL";
-    $schema['description'] = "text NOT NULL";
-    $schema['orientation'] = "varchar(255) NOT NULL";
-    $schema['link'] = 'int(11) NOT NULL';
-    $schema['keys']['title'] = 'FULLTEXT KEY title (title)';
-    $schema['keys']['description'] = 'FULLTEXT KEY description (description)';
-    $schema['keys']['orientation'] = 'FULLTEXT KEY orientation (orientation)';
+
+    foreach ($this->getBasicFields() as $field => $fieldSchema) {
+      $schema[$field] = $fieldSchema;
+      if ($field != 'link') {
+        $schema['keys'][$field] = 'FULLTEXT KEY ' . $field . '(' . $field . ')';
+      }
+    }
 
     return $schema;
+  }
+
+  /**
+   * getBasicFields - get basic fields and their database schema
+   *
+   */
+  public function getBasicFields() {
+    $settings = $this->modules->get('InputfieldImageExtra')->data;
+
+    $basicFields = array();
+    $settingFields = array('title', 'description', 'orientation', 'link', 'other');
+    foreach ($settingFields as $name) {
+      if (!empty($settings[$name . 'Field'])) {
+        switch ($name) {
+          case 'title':
+            $basicFields[$name] = 'varchar(1024) NOT NULL';
+            break;
+
+          case 'description':
+            $basicFields[$name] = 'text NOT NULL';
+            break;
+
+          case 'orientation':
+            $basicFields[$name] = 'varchar(255) NOT NULL';
+            break;
+
+          case 'link':
+            $basicFields[$name] = 'int(11) NOT NULL';
+            break;
+
+          case 'other':
+            foreach (explode(',', $settings[$name . 'Field']) as $otherField) {
+              $basicFields[$otherField] = 'varchar(1024) NOT NULL';
+            }
+            break;
+        }
+      }
+    }
+
+    return $basicFields;
   }
 
   /**

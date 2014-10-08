@@ -1,0 +1,92 @@
+<?php
+
+/**
+*
+* By Tabea David
+*
+*/
+
+/**
+*
+* ImageExtraLanguageSupport
+*
+* See README.md for usage instructions.
+*
+* @author Tabea David <info@justonestep.de>
+* @version 1.0.0
+* @copyright Copyright (c) 2014
+* @see https://github.com/justonestep/processwire-fieldtypeimageextra
+* @see http://www.processwire.com
+*
+*/
+
+/**
+* Class ImageExtraLanguageSupport
+*/
+class ImageExtraLanguageSupport extends WireData implements Module {
+
+  /**
+   * Retrieves module meta data
+   * Implementation of the Module interface
+   *
+   * @return array
+   * @see http://processwire.com/apigen/class-Module.html
+   */
+  public static function getModuleInfo() {
+    return array(
+      'title' => 'ImageExtraLanguageSupport',
+      'summary' => 'Mobile Detect uses a lightweight PHP class for detecting mobile devices (including tablets).',
+      'version' => 1,
+      'href' => 'https://github.com/justonestep/processwire-mobiledetect',
+      'singular' => true,
+      'autoload' => true,
+    );
+  }
+
+  /**
+   * Initialize the module
+   * add hook
+   *
+   */
+  public function init() {
+		$this->addHookAfter('Fieldtype::loadPageField', $this, 'renderLanguageSupport'); 
+  }
+
+  /**
+   * Hook renderLanguageSupport
+   *
+   * @param HookEvent $event
+   */
+  public function renderLanguageSupport(HookEvent $event) {
+    $page = $event->arguments[0];
+    $field = $event->arguments[1];
+    $value = $event->return; 
+
+    $user = $this->wire('user');
+    $languageID = $user->language->id;
+    $languages = $this->wire('languages');
+
+    if ($languageID != $languages->get('default')->id) {
+      if ($field->type instanceof FieldtypeImageExtraLanguage) {
+
+        foreach (reset($value) as $f => $v) {
+          if (preg_match('/([0-9])\w+/', $f)) {
+            $fLanguageID = (int)preg_replace('/([a-z])*([0-9]\w+)/', '$2', $f);
+            if ($languageID === $fLanguageID) {
+              $fBasic = preg_replace('/([0-9]\w+)/', '', $f);
+
+              if (!empty($f)) {
+                $value[0][$fBasic] = $v;
+              }
+            }
+          }
+        }
+
+      }
+    }
+
+    $event->return = $value;
+  }
+
+
+}

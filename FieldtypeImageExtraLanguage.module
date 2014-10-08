@@ -8,12 +8,11 @@
  * ProcessWire 2.x
  * Licensed under GNU/GPL v2, see LICENSE.TXT
  *
- * @author Ryan Cramer, Tabea David <info@justonestep.de>
+ * @author Tabea David <info@justonestep.de>
  * @version 1.0.0
  * @copyright Copyright (c) 2014
  * @see https://github.com/justonestep/processwire-fieldtypeimageextra
  * @see http://www.processwire.com
- * @see http://www.ryancramer.com
  *
  */
 
@@ -57,6 +56,14 @@ class FieldtypeImageExtraLanguage extends FieldtypeImageExtra {
     }
 
     return $schema;
+  }
+
+  /**
+   * install - install module ImageExtraLanguageSupport as well
+   *
+   */
+  public function ___install() {
+    $this->modules->get("ImageExtraLanguageSupport");
   }
 
 }

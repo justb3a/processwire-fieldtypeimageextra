@@ -59,29 +59,31 @@ class ImageExtraLanguageSupport extends WireData implements Module {
     $value = $event->return;
 
     $user = $this->wire('user');
-    $languageID = $user->language->id;
-    $languages = $this->wire('languages');
+    if (isset($user->language) && !empty($user->language)){
+      $languageID = $user->language->id;
+      $languages = $this->wire('languages');
 
-    if ($languageID != $languages->get('default')->id) {
-      if ($field->type instanceof FieldtypeImageExtraLanguage) {
+      if ($languageID != $languages->get('default')->id) {
+        if ($field->type instanceof FieldtypeImageExtraLanguage) {
 
-        foreach (reset($value) as $f => $v) {
-          if (preg_match('/([0-9])\w+/', $f)) {
-            $fLanguageID = (int)preg_replace('/([a-z])*([0-9]\w+)/', '$2', $f);
-            if ($languageID === $fLanguageID) {
-              $fBasic = preg_replace('/([0-9]\w+)/', '', $f);
+          foreach (reset($value) as $f => $v) {
+            if (preg_match('/([0-9])\w+/', $f)) {
+              $fLanguageID = (int)preg_replace('/([a-z])*([0-9]\w+)/', '$2', $f);
+              if ($languageID === $fLanguageID) {
+                $fBasic = preg_replace('/([0-9]\w+)/', '', $f);
 
-              if (!empty($f)) {
-                $value[0][$fBasic] = $v;
+                if (!empty($f)) {
+                  $value[0][$fBasic] = $v;
+                }
               }
             }
           }
+
         }
-
       }
-    }
 
-    $event->return = $value;
+      $event->return = $value;
+    }
   }
 
 }

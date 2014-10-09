@@ -34,6 +34,8 @@ class ImageExtraLanguageSupport extends WireData implements Module {
       'version' => 101,
       'summary' => 'Language Support for Fieldtype Images Extra',
       'href' => 'https://github.com/justonestep/processwire-fieldtypeimageextra',
+      'singular' => true,
+      'autoload' => true,
     );
   }
 

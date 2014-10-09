@@ -1,16 +1,16 @@
 <?php
 
 /**
- * ProcessWire Inputfield Image Extra
+ * ProcessWire Fieldtype Image Extra
  *
  * See README.md for usage instructions.
  *
  * ProcessWire 2.x
  * Licensed under GNU/GPL v2, see LICENSE.TXT
  *
- * @author Ryan Cramer, Tabea David <info@justonestep.de>
- * @version 1.0.0
- * @copyright Copyright (c) 2014
+ * @author Tabea David <td@kf-interactive.com>
+ * @version 1.0.1
+ * @copyright Copyright (c) 2014 KF Interactive, www.kf-interactive.com, <info@kf-interactive.com>
  * @see https://github.com/justonestep/processwire-fieldtypeimageextra
  * @see http://www.processwire.com
  * @see http://www.ryancramer.com
@@ -47,7 +47,7 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
   public static function getModuleInfo() {
     return array(
       'title' => 'Images Extra Inputfield',
-      'version' => 100,
+      'version' => 101,
       'summary' => 'One or more image uploads (sortable) with extra fields',
       'href' => 'https://github.com/justonestep/processwire-fieldtypeimageextra',
     );
@@ -77,9 +77,9 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
         'columnWidth' => 25
       ),
       'orientationValues' => array(
-      'type' => 'InputfieldText',
-      'description' => 'Values for Image Orientation Select Field' . PHP_EOL . '(comma-separated list)',
-      'size' => 45,
+        'type' => 'InputfieldText',
+        'description' => 'Values for Image Orientation Select Field' . PHP_EOL . '(comma-separated list)',
+        'size' => 45,
         'placeholder' => 'left,right',
         'columnWidth' => 25
       ),
@@ -168,6 +168,10 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
         $this->config->{$type}->add($this->config->urls->{$item} . $item . $fileExtension);
       }
     }
+ 
+    foreach (array('scripts' => '.js', 'styles' => '.css') as $type => $fileExtension) {
+      $this->config->{$type}->add($this->config->urls->InputfieldImageExtra . 'ImageExtraLanguage' . $fileExtension);
+    }
 
     return parent::___render();
   }
@@ -198,10 +202,11 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
         $basicField = $name;
       }
 
+      // assign html output depending on field
       switch ($name) {
-
+        // orientation field, select
         case 'orientation':
-          $out[$basicField] = "<br /><label for='$for' class='infield'>$label</label>";
+          $out[$basicField] = "<label for='$for' class='infield'>$label</label>";
           $out[$basicField] .= "<select name='$for' size='1'>";
 
           foreach (explode(',', $this->data['orientationValues']) as $type) {
@@ -209,60 +214,71 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
             $out[$basicField] .= "<option value='$type' $selected>$type</option>";
           }
 
-          $out[$basicField] .= "</select><br /><br />";
+          $out[$basicField] .= "</select>";
         break;
 
+        // title field, input
         case 'title':
           $value = htmlspecialchars($pagefile->{$name}, ENT_QUOTES, "UTF-8");
-          $out[$basicField] = "<br /><label for='$for' class='InputfieldFileDescription infield'>$label";
-          $out[$basicField] .= "<input type='text' name='$for' id='$for' value='$value' />";
-          $out[$basicField] .= "</label><br />";
+          $class = 'InputfieldFileDescription input-imageextra input-imageextra infield';
+          $out[$basicField] = "<label for='$for' data-group='{$basicField}' class='{$class}'>$label";
+          $out[$basicField] .= "<input type='text' name='$for' id='$for' value='$value' /></label>";
         break;
 
+        // title fields multi-language, input
         case (preg_match('/title([0-9])\w+/', $name) ? true : false):
           $value = htmlspecialchars($pagefile->{$name}, ENT_QUOTES, "UTF-8");
-          $out[$basicField] .= "<label for='$for' class='InputfieldFileDescription infield'>$label";
-          $out[$basicField] .= "<input type='text' name='$for' id='$for' value='$value' />";
-          $out[$basicField] .= "</label><br />";
+          $class = 'InputfieldFileDescription input-imageextra__language infield';
+          $out[$basicField] .= "<label for='$for' data-group='{$basicField}' class='{$class}'>$label";
+          $out[$basicField] .= "<input type='text' name='$for' id='$for' value='$value' /></label>";
         break;
 
+        // description field, textarea
         case 'description':
+          $class = 'InputfieldFileDescription input-imageextra infield';
           $value = htmlspecialchars($pagefile->{$name}, ENT_QUOTES, "UTF-8");
-          $out[$basicField] = "<br /><label for='$for' class='InputfieldFileDescription infield'>$label";
-          $out[$basicField] .= "<textarea id='$for' name='$for' rows='{$this->descriptionRows}'>$value</textarea>";
-          $out[$basicField] .= "</label><br />";
+          $out[$basicField] = "<label for='$for' data-group='{$basicField}' class='{$class}'>$label";
+          $out[$basicField] .= "<textarea id='$for' name='$for' rows='3'>$value</textarea></label>";
         break;
 
+        // descriptions field multi-language, textarea
         case (preg_match('/description.*/', $name) ? true : false):
+          $class = 'InputfieldFileDescription input-imageextra__language infield';
           $value = htmlspecialchars($pagefile->{$name}, ENT_QUOTES, "UTF-8");
-          $out[$basicField] .= "<label for='$for' class='InputfieldFileDescription infield'>$label";
-          $out[$basicField] .= "<textarea id='$for' name='$for' rows='{$this->descriptionRows}'>$value</textarea>";
-          $out[$basicField] .= "</label><br />";
+          $out[$basicField] .= "<label for='$for' data-group='{$basicField}' class='{$class}'>$label";
+          $out[$basicField] .= "<textarea id='$for' name='$for' rows='3'>$value</textarea></label>";
         break;
 
+        // link field. page list select
         case 'link':
           $value = (int)$pagefile->$name;
           $field = $this->modules->get('InputfieldPageListSelect');
           $field->startLabel = $this->_('Choose Link');
           $field->setAttribute('name+id', $for);
           $field->attr('value', $value);
-          $out[$basicField] = '<br />' . $field->render();
+          $out[$basicField] = $field->render();
         break;
 
+        // other fields, input
         default:
+          $class = 'InputfieldFileDescription input-imageextra infield';
           $value = htmlspecialchars($pagefile->{$name}, ENT_QUOTES, "UTF-8");
-          $out[$basicField] = "<br /><label for='$for' class='InputfieldFileDescription infield'>$label";
-          $out[$basicField] .= "<input type='text' name='$for' id='$for' value='$value' />";
-          $out[$basicField] .= "</label><br />";
+          $out[$basicField] = "<label for='$for' data-group='{$basicField}' class='{$class}'>$label";
+          $out[$basicField] .= "<input type='text' name='$for' id='$for' value='$value' /></label>";
         break;
 
+        // other fields multi-language, input
         case (preg_match('/([0-9])\w+/', $name) ? true : false):
+          $class = 'InputfieldFileDescription input-imageextra__language infield';
           $value = htmlspecialchars($pagefile->{$name}, ENT_QUOTES, "UTF-8");
-          $out[$basicField] .= "<label for='$for' class='InputfieldFileDescription infield'>$label";
-          $out[$basicField] .= "<input type='text' name='$for' id='$for' value='$value' />";
-          $out[$basicField] .= "</label><br />";
+          $out[$basicField] .= "<label for='$for' data-group='{$basicField}' class='{$class}'>$label";
+          $out[$basicField] .= "<input type='text' name='$for' id='$for' value='$value' /></label>";
         break;
       }
+    }
+
+    foreach ($out as $f => $o) {
+      $out[$f] = "<div class='imageextra--wrapper'>{$o}</div>";
     }
 
     return implode('', $out);

@@ -1,24 +1,20 @@
 <?php
 
 /**
-*
-* By Tabea David
-*
-*/
-
-/**
-*
-* ImageExtraLanguageSupport
-*
-* See README.md for usage instructions.
-*
-* @author Tabea David <info@justonestep.de>
-* @version 1.0.0
-* @copyright Copyright (c) 2014
-* @see https://github.com/justonestep/processwire-fieldtypeimageextra
-* @see http://www.processwire.com
-*
-*/
+ * ProcessWire Image Extra Language Support
+ *
+ * See README.md for usage instructions.
+ *
+ * ProcessWire 2.x
+ * Licensed under GNU/GPL v2, see LICENSE.TXT
+ *
+ * @author Tabea David <td@kf-interactive.com>
+ * @version 1.0.1
+ * @copyright Copyright (c) 2014 KF Interactive, www.kf-interactive.com, <info@kf-interactive.com>
+ * @see https://github.com/justonestep/processwire-fieldtypeimageextra
+ * @see http://www.processwire.com
+ *
+ */
 
 /**
 * Class ImageExtraLanguageSupport
@@ -34,12 +30,10 @@ class ImageExtraLanguageSupport extends WireData implements Module {
    */
   public static function getModuleInfo() {
     return array(
-      'title' => 'ImageExtraLanguageSupport',
-      'summary' => 'Mobile Detect uses a lightweight PHP class for detecting mobile devices (including tablets).',
-      'version' => 1,
-      'href' => 'https://github.com/justonestep/processwire-mobiledetect',
-      'singular' => true,
-      'autoload' => true,
+      'title' => 'Images Extra Fieldtype Language Support',
+      'version' => 101,
+      'summary' => 'Language Support for Fieldtype Images Extra',
+      'href' => 'https://github.com/justonestep/processwire-fieldtypeimageextra',
     );
   }
 
@@ -49,7 +43,7 @@ class ImageExtraLanguageSupport extends WireData implements Module {
    *
    */
   public function init() {
-		$this->addHookAfter('Fieldtype::loadPageField', $this, 'renderLanguageSupport'); 
+		$this->addHookAfter('Fieldtype::loadPageField', $this, 'renderLanguageSupport');
   }
 
   /**
@@ -60,7 +54,7 @@ class ImageExtraLanguageSupport extends WireData implements Module {
   public function renderLanguageSupport(HookEvent $event) {
     $page = $event->arguments[0];
     $field = $event->arguments[1];
-    $value = $event->return; 
+    $value = $event->return;
 
     $user = $this->wire('user');
     $languageID = $user->language->id;
@@ -87,6 +81,5 @@ class ImageExtraLanguageSupport extends WireData implements Module {
 
     $event->return = $value;
   }
-
 
 }

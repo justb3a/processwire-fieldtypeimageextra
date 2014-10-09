@@ -1,12 +1,13 @@
-$(function(){
-
-  var $langField = $('.InputfieldImageExtra').has('.LanguageSupport');
+function handleLanguages() {
+  var $langField = $('.InputfieldImageExtraItem').has('.LanguageSupport');
   $langField.each(function(){
     var $this = $(this);
 
     var $langHeader =  $this.children('.InputfieldImageExtraHeader');
     var $langContent =  $this.children('.InputfieldContent');
     var $langSupport = $langContent.children('.LanguageSupport');
+
+    // console.log($this);
 
     //should avoid applying to single language field like Language "alt" fields
     if ($langSupport.length > 1) {
@@ -57,5 +58,22 @@ $(function(){
     }
 
   }); // end each
+}
+
+$(function(){
+
+  handleLanguages();
+
+  $('.FieldtypeImageExtraLanguage').on('change', function() {
+    var $langField = $(this).parent('p').parent('.InputfieldContent')
+      .find('.InputfieldImageExtraItem').has('.LanguageSupport');
+    handleLanguages($langField);
+
+    setTimeout(function() {
+      handleLanguages();
+    }, 1000);
+
+  });
+
 
 });

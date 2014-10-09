@@ -1,19 +1,6 @@
-.imageextra--wrapper {
-  position: relative;
-  padding: 15px;
-  background: #fff;
-}
-
-.imageextra--wrapper label {
-  padding-bottom: 10px;
-}
-
-
-
 #content .langTabsContainer {
 	padding-bottom: 0;
 }
-
 .langTabs{
 	padding: 0;
 }
@@ -27,7 +14,6 @@
 }
 .langTabs .ui-tabs-panel .LanguageSupportLabel {
 	display: none;
-
 }
 .langTabs.ui-tabs .ui-tabs-nav {
 	margin-bottom: 0;
@@ -54,20 +40,37 @@
 	margin: 0;
 }
 
-.langTabsToggle{
-	float: right;
-	margin-right: 1em;
+.InputfieldImageExtraItem .InputfieldContentSimple {
+  padding: 0 15px;
 }
 
-.InputfieldStateCollapsed .langTabsToggle {
-	display: none;
+.content .InputfieldImageExtraHeader {
+  padding: 15px 15px 5px 15px;
+  font-weight: bold;
+  font-size: 15px;
+  margin: 0;
+  border-top: 1px solid #DCDCDC;
+  background: rgba(240, 240, 240, 0.7);
 }
 
-.langTabEmpty{
-	opacity: 0.7;
-	font-weight: normal !important;
+#content .InputfieldImageExtraItem .ui-tabs {
+  border-left: 1px solid #DCDCDC;
 }
 
-.langTabsOff .langTabs > ul{
-	display: none !important;
+
+.InputfieldImageExtraItem {
+  background: rgba(240, 240, 240, 0.7);
+}
+
+.InputfieldImageExtraItem__inline {
+  padding-bottom: 10px;
+  width: 50%;
+  display: inline-block;
+  border-right: 1px solid #DCDCDC;
+}
+
+.InputfieldImageExtraItem__nolanguage input, .InputfieldImageExtraItem__nolanguage textarea {
+  background: #fff;
+  margin: 0 1%;
+  width: 98%;
 }

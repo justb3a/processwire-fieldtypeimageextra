@@ -180,15 +180,25 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
    * renderItemDescriptionField - build html structure for the backend
    *
    * @param Pagefile $pagefile
-   * @param string $id
+   * @param string $id - field name
    * @param int $n
    */
   protected function renderItemDescriptionField(Pagefile $pagefile, $id, $n) {
+    // fieldname plus `_hash`
+    $field = str_replace('_' . $pagefile->hash, '', $id);
+    // repeater image
+    $field = preg_replace('/(_)([a-zA-Z])+?([0-9]\w+)/', '', $field);
+
+    // is it a language field
+    if ($this->fields->get($field)->type instanceof FieldtypeImageExtraLanguage) {
+      $hasLanguage = true;
+    } else {
+      $hasLanguage = false;
+    }
+
     $out = array();
     $languageIDs = $this->getLanguages();
     $languages = $this->wire('languages');
-    $fieldLanguage = $languages->get('default')->id;
-    $labelLanguage = $languages->get('default')->title;
 
     foreach ($this->customFields as $field) {
       $for = $field['name'] . '_' . $id;
@@ -205,100 +215,104 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
         $basicField = preg_replace('/([0-9]\w+)/', '', $name);
       } else {
         $basicField = $name;
+        $fieldLanguage = $languages->get('default')->id;
+        $labelLanguage = $languages->get('default')->title;
       }
 
 
       // assign html output depending on field
       switch ($name) {
-        // title field, input
-        case 'title':
+        // description field, textarea
+        case 'description':
           $value = htmlspecialchars($pagefile->{$name}, ENT_QUOTES, "UTF-8");
 
-          // if language support
-          // $out[$basicField] = "<label class='InputfieldHeader' for='$for'>$label</label>";
-          $out[$basicField] = "<div class='InputfieldImageExtra' id='wrap_inputimageextra_$label'><h3 class='InputfieldImageExtraHeader'>$label</h3>";
+          $out[$basicField] = "<div class='InputfieldImageExtraItem' id='wrap_inputimageextra_$label'><h3 class='InputfieldImageExtraHeader'>$label</h3>";
           $out[$basicField] .= "<div class='InputfieldContent'>";
           $out[$basicField] .= "<div class='LanguageSupport' data-language='{$fieldLanguage}'>";
-          $out[$basicField] .= "<label for='$for' class='LanguageSupportLabel detail'>$labelLanguage</label>";
-          $out[$basicField] .= "<input type='text' name='$for' id='$for' value='$value' class='InputfieldMaxWidth' /></div>";
+
+          if ($hasLanguage) {
+            $out[$basicField] .= "<label for='$for' class='LanguageSupportLabel detail'>$labelLanguage</label>";
+          }
+
+          $out[$basicField] .= "<textarea id='$for' name='$for' rows='3'>$value</textarea></div>";
+        break;
+
+        // descriptions field multi-language, textarea
+        case (preg_match('/description.*/', $name) ? true : false):
+          $value = htmlspecialchars($pagefile->{$name}, ENT_QUOTES, "UTF-8");
+
+          $out[$basicField] .= "<div class='LanguageSupport' data-language='{$fieldLanguage}'>";
+
+          if ($hasLanguage) {
+            $out[$basicField] .= "<label for='$for' class='LanguageSupportLabel detail'>$labelLanguage</label>";
+          }
+
+          $out[$basicField] .= "<textarea id='$for' name='$for' rows='3'>$value</textarea></div>";
+        break;
+
+        // orientation field, select
+        case 'orientation':
+          $out[$basicField] = "<div class='InputfieldImageExtraItem InputfieldImageExtraItem__inline' id='wrap_inputimageextra_$label'><h3 class='InputfieldImageExtraHeader'>$label</h3>";
+          $out[$basicField] .= "<div class='InputfieldContent InputfieldContentSimple'>";
+          $out[$basicField] .= "<select name='$for' size='1'>";
+
+          foreach (explode(',', $this->data['orientationValues']) as $type) {
+            $selected = $pagefile->{$name} === $type ? 'selected' : '';
+            $out[$basicField] .= "<option value='$type' $selected>$type</option>";
+          }
+
+          $out[$basicField] .= "</select>";
+        break;
+
+        // link field. page list select
+        case 'link':
+          $value = (int)$pagefile->$name;
+          $field = $this->modules->get('InputfieldPageListSelect');
+          $field->startLabel = $this->_('Choose Link');
+          $field->setAttribute('name+id', $for);
+          $field->attr('value', $value);
+          $out[$basicField] = "<div class='InputfieldImageExtraItem InputfieldImageExtraItem__inline' id='wrap_inputimageextra_$label'><h3 class='InputfieldImageExtraHeader'>$label</h3>";
+          $out[$basicField] .= "<div class='InputfieldContent InputfieldContentSimple'>";
+          $out[$basicField] .= $field->render();
         break;
 
         // title fields multi-language, input
-        case (preg_match('/title([0-9])\w+/', $name) ? true : false):
+        // other fields multi-language, input
+        case (preg_match('/([0-9])\w+/', $name) ? true : false):
           $value = htmlspecialchars($pagefile->{$name}, ENT_QUOTES, "UTF-8");
 
           $out[$basicField] .= "<div class='LanguageSupport' data-language='{$fieldLanguage}'>";
-          $out[$basicField] .= "<label for='$for' class='LanguageSupportLabel detail'>$labelLanguage</label>";
+
+          if ($hasLanguage) {
+            $out[$basicField] .= "<label for='$for' class='LanguageSupportLabel detail'>$labelLanguage</label>";
+          }
+
           $out[$basicField] .= "<input type='text' name='$for' id='$for' value='$value' class='InputfieldMaxWidth' /></div>";
         break;
 
+        // title field, input
+        // other fields, input
+        default:
+          $value = htmlspecialchars($pagefile->{$name}, ENT_QUOTES, "UTF-8");
 
+          $out[$basicField] = "<div class='InputfieldImageExtraItem' id='wrap_inputimageextra_$label'><h3 class='InputfieldImageExtraHeader'>$label</h3>";
+          $out[$basicField] .= "<div class='InputfieldContent'>";
+          $out[$basicField] .= "<div class='LanguageSupport' data-language='{$fieldLanguage}'>";
 
+          if ($hasLanguage) {
+            $out[$basicField] .= "<label for='$for' class='LanguageSupportLabel detail'>$labelLanguage</label>";
+          }
 
-
-        // // orientation field, select
-        // case 'orientation':
-        //   $out[$basicField] = "<label for='$for' class='infield'>$label</label>";
-        //   $out[$basicField] .= "<select name='$for' size='1'>";
-        //
-        //   foreach (explode(',', $this->data['orientationValues']) as $type) {
-        //     $selected = $pagefile->{$name} === $type ? 'selected' : '';
-        //     $out[$basicField] .= "<option value='$type' $selected>$type</option>";
-        //   }
-        //
-        //   $out[$basicField] .= "</select>";
-        // break;
-        //
-        // // description field, textarea
-        // case 'description':
-        //   $class = 'InputfieldFileDescription input-imageextra infield';
-        //   $value = htmlspecialchars($pagefile->{$name}, ENT_QUOTES, "UTF-8");
-        //   $out[$basicField] = "<label for='$for' data-group='{$basicField}' class='{$class}'>$label";
-        //   $out[$basicField] .= "<textarea id='$for' name='$for' rows='3'>$value</textarea></label>";
-        // break;
-        //
-        // // descriptions field multi-language, textarea
-        // case (preg_match('/description.*/', $name) ? true : false):
-        //   $class = 'InputfieldFileDescription input-imageextra__language infield';
-        //   $value = htmlspecialchars($pagefile->{$name}, ENT_QUOTES, "UTF-8");
-        //   $out[$basicField] .= "<label for='$for' data-group='{$basicField}' class='{$class}'>$label";
-        //   $out[$basicField] .= "<textarea id='$for' name='$for' rows='3'>$value</textarea></label>";
-        // break;
-        //
-        // // link field. page list select
-        // case 'link':
-        //   $value = (int)$pagefile->$name;
-        //   $field = $this->modules->get('InputfieldPageListSelect');
-        //   $field->startLabel = $this->_('Choose Link');
-        //   $field->setAttribute('name+id', $for);
-        //   $field->attr('value', $value);
-        //   $out[$basicField] = $field->render();
-        // break;
-//
-//         // other fields, input
-//         default:
-//           $class = 'InputfieldFileDescription input-imageextra infield';
-//           $value = htmlspecialchars($pagefile->{$name}, ENT_QUOTES, "UTF-8");
-//           $out[$basicField] = "<label for='$for' data-group='{$basicField}' class='{$class}'>$label";
-//           $out[$basicField] .= "<input type='text' name='$for' id='$for' value='$value' /></label>";
-//         break;
-//
-//         // other fields multi-language, input
-//         case (preg_match('/([0-9])\w+/', $name) ? true : false):
-//           $class = 'InputfieldFileDescription input-imageextra__language infield';
-//           $value = htmlspecialchars($pagefile->{$name}, ENT_QUOTES, "UTF-8");
-//           $out[$basicField] .= "<label for='$for' data-group='{$basicField}' class='{$class}'>$label";
-//           $out[$basicField] .= "<input type='text' name='$for' id='$for' value='$value' /></label>";
-//         break;
+          $out[$basicField] .= "<input type='text' name='$for' id='$for' value='$value' class='InputfieldMaxWidth' /></div>";
+        break;
       }
     }
 
     foreach ($out as $f => $o) {
-      // $out[$f] = "<div class='imageextra--wrapper'>{$o}</div>";
       $out[$f] = "$o</div></div>";
     }
 
-    return implode('', $out);
+    return ($hasLanguage) ? implode('', $out) : '<div class="InputfieldImageExtraItem__nolanguage">' . implode('', $out) . '</div>';
   }
 
   /**

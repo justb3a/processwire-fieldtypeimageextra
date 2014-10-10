@@ -30,7 +30,7 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
     'orientationField' => true,
     'orientationValues' => 'left,right',
     'titleField' => true,
-    'descriptionField' => true,
+    'descriptionField' => false,
     'linkField' => true,
     'otherField' => ''
   );

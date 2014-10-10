@@ -187,7 +187,7 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
     // fieldname plus `_hash`
     $field = str_replace('_' . $pagefile->hash, '', $id);
     // repeater image
-    $field = preg_replace('/(_)([a-zA-Z])+?([0-9]\w+)/', '', $field);
+    $field = preg_replace('/(_)(repeater)([0-9]\w+)/', '', $field);
 
     // is it a language field
     if ($this->fields->get($field)->type instanceof FieldtypeImageExtraLanguage) {

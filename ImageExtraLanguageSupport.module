@@ -58,32 +58,55 @@ class ImageExtraLanguageSupport extends WireData implements Module {
     $field = $event->arguments[1];
     $value = $event->return;
 
-    $user = $this->wire('user');
-    if (isset($user->language) && !empty($user->language)){
-      $languageID = $user->language->id;
-      $languages = $this->wire('languages');
+    // first check whether it is FieldtypeImageExtraLanguage
+    if ($field->type instanceof FieldtypeImageExtraLanguage && is_array($value)) {
 
-      if ($languageID != $languages->get('default')->id) {
-        if ($field->type instanceof FieldtypeImageExtraLanguage) {
+      // get the language of the user, handle all other languages
+      $user = $this->wire('user');
+      if (isset($user->language) && !empty($user->language)){
+        $languageID = $user->language->id;
+        $languages = $this->wire('languages');
 
-          foreach (reset($value) as $f => $v) {
-            if (preg_match('/([0-9])\w+/', $f)) {
-              $fLanguageID = (int)preg_replace('/([a-z])*([0-9]\w+)/', '$2', $f);
-              if ($languageID === $fLanguageID) {
-                $fBasic = preg_replace('/([0-9]\w+)/', '', $f);
+          // check whether it is not the default language
+          if ($languageID != $languages->get('default')->id) {
+            $value = $this->getLanguageSubstitution($value, $languageID);
+          }
+      }
+    }
 
-                if (!empty($f)) {
-                  $value[0][$fBasic] = $v;
-                }
-              }
+    $event->return = $value;
+  }
+
+  /**
+   * Hook getLanguageSubstitution
+   * get translations and assign them
+   *
+   * @param array $value
+   * @param int $languageID
+   * @return array
+   */
+  private function getLanguageSubstitution($value, $languageID) {
+    // loop through it - could have multiple images
+    foreach ($value as $key => $image) {
+      foreach ($image as $f => $v) {
+
+        // is it a multi-language field
+        if (preg_match('/([0-9])\w+/', $f)) {
+          $fLanguageID = (int)preg_replace('/([a-z])*([0-9]\w+)/', '$2', $f);
+
+          if ($languageID === $fLanguageID) {
+            $fBasic = preg_replace('/([0-9]\w+)/', '', $f);
+
+            if (!empty($f)) {
+              $value[$key][$fBasic] = $v;
             }
           }
-
         }
-      }
 
-      $event->return = $value;
+      }
     }
+
+    return $value;
   }
 
 }

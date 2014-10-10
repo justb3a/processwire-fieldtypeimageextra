@@ -1,10 +1,11 @@
-# ProcessWire Fieldtype Image Extra
+# ProcessWire  
+Fieldtype Image Extra (Multi-languages)
 
 ## Overview:
 
 Extends Filetype Image. Adds description, title, link and orientation.
 
-Designed for use with ProcessWire 2.4
+Designed for use with ProcessWire 2.4/2.5
 [http://processwire.com](http://processwire.com)
 
 ## Installation

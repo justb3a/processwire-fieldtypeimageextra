@@ -1,43 +1,43 @@
 #content .langTabsContainer {
-	padding-bottom: 0;
+  padding-bottom: 0;
 }
 .langTabs{
-	padding: 0;
+  padding: 0;
 }
 .langTabs .ui-tabs-nav.ui-widget-header{
-	padding: 2px 3px 0 ;
-	border-bottom: none;
+  padding: 2px 3px 0 ;
+  border-bottom: none;
 }
 .langTabs .ui-tabs-panel {
-	padding: 0.9em;
-	border-top: none;
+  padding: 0.9em;
+  border-top: none;
 }
 .langTabs .ui-tabs-panel .LanguageSupportLabel {
-	display: none;
+  display: none;
 }
 .langTabs.ui-tabs .ui-tabs-nav {
-	margin-bottom: 0;
+  margin-bottom: 0;
 }
 .langTabs.ui-tabs .ui-tabs-nav li {
-	margin: 0 4px 0 0;
+  margin: 0 4px 0 0;
 }
 .langTabs.ui-tabs .ui-tabs-nav li a  {
-	padding: 0.3em 0.7em;
-	font-weight: bold;
-	outline: none;
-	font-size: 0.846153846153846em;
+  padding: 0.3em 0.7em;
+  font-weight: bold;
+  outline: none;
+  font-size: 0.846153846153846em;
 }
 .langTabs.ui-tabs .ui-tabs-nav li.ui-state-active.ui-state-default{
-	border: 1px solid #fff;
-	padding-bottom: 0;
+  border: 1px solid #fff;
+  padding-bottom: 0;
 }
 .langTabs.ui-tabs .ui-tabs-nav li.ui-state-active {
-	background: #fff;
+  background: #fff;
 }
 .langTabs.ui-tabs .ui-tabs-nav li.ui-state-active a {
-	cursor: default;
-	background: #fff;
-	margin: 0;
+  cursor: default;
+  background: #fff;
+  margin: 0;
 }
 
 .InputfieldImageExtraItem .InputfieldContentSimple {
@@ -45,7 +45,7 @@
 }
 
 .content .InputfieldImageExtraHeader {
-  padding: 15px 15px 5px 15px;
+  padding: 5px 15px;
   font-weight: bold;
   font-size: 15px;
   margin: 0;
@@ -62,10 +62,17 @@
   background: rgba(240, 240, 240, 0.7);
 }
 
+.InputfieldImageExtraItem .LanguageSupport input {
+  margin-bottom: 7px;
+}
+
 .InputfieldImageExtraItem__inline {
   padding-bottom: 10px;
   width: 50%;
   display: inline-block;
+}
+
+.InputfieldImageExtraItem__inline-first {
   border-right: 1px solid #DCDCDC;
 }
 

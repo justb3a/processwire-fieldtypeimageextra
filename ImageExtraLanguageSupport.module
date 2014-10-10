@@ -97,7 +97,7 @@ class ImageExtraLanguageSupport extends WireData implements Module {
           if ($languageID === $fLanguageID) {
             $fBasic = preg_replace('/([0-9]\w+)/', '', $f);
 
-            if (!empty($f)) {
+            if (!empty($v)) {
               $value[$key][$fBasic] = $v;
             }
           }

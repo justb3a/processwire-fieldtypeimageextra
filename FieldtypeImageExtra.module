@@ -60,11 +60,14 @@ class FieldtypeImageExtra extends FieldtypeImage {
    */
   public function getDatabaseSchema(Field $field) {
     $schema = parent::getDatabaseSchema($field);
-    unset($schema['description']);
-    $schema['data'] = 'varchar(255) NOT NULL';
 
     foreach ($this->getBasicFields() as $field => $fieldSchema) {
+      if ($field === 'description') {
+        unset($schema['description']);
+      }
+
       $schema[$field] = $fieldSchema;
+
       if ($field != 'link') {
         $schema['keys'][$field] = 'FULLTEXT KEY ' . $field . '(' . $field . ')';
       }

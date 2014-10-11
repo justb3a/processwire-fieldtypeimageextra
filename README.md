@@ -75,23 +75,23 @@ For use with [TemplateTwigReplace](http://modules.processwire.com/modules/templa
 
 **Module `Images Extra Inputfield` Settings**
 
-![screenshot](screens/InputfieldImageExtra-settings.png)
+!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/InputfieldImageExtra-settings.png(screenshot)!
 
 **Assign the new type to a field**
 
-![screenshot](screens/FieldSettings-ImageExtra.png)
+!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/FieldSettings-ImageExtra.png(screenshot)!
 
-![screenshot](screens/FieldSettings-ImageExtraLanguage.png)
+!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/FieldSettings-ImageExtraLanguage.png(screenshot)!
 
 **It's really important to confirm the change, because it may need database updates**
 
-![screenshot](screens/FieldSettings-confirm.png)
+!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/FieldSettings-confirm.png(screenshot)!
 
 **ImageExtra**
 
 Backend
 
-![screenshot](screens/ImageExtra-backend.png)
+!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/ImageExtra-backend.png(screenshot)!
 
 Here is a litte example how to access the new fields:
 
@@ -113,19 +113,19 @@ if (count($page->images)) {
 
 And the result in the frontend may look like this:
 
-![screenshot](screens/ImageExtra-frontend.png)
+!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/ImageExtra-frontend.png(screenshot)!
 
 **ImageExtraLanguage**
 
 Backend
 
-![screenshot](screens/ImageExtraLanguage-default-backend.png)
+!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/ImageExtraLanguage-default-backend.png(screenshot)!
 
-![screenshot](screens/ImageExtraLanguage-other-backend.png)
+!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/ImageExtraLanguage-other-backend.png(screenshot)!
 
 Frontend
 
 Depending on the selected language you will get a different output.  
 If you don't translate an field, you get the value of the default language (look at author).
 
-![screenshot](screens/ImageExtraLanguage-frontend.png)
+!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/ImageExtraLanguage-frontend.png(screenshot)!

@@ -75,23 +75,23 @@ For use with [TemplateTwigReplace](http://modules.processwire.com/modules/templa
 
 **Module `Images Extra Inputfield` Settings**
 
-!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/InputfieldImageExtra-settings.png(screenshot)!
+![Image Extra Inputfield Settings](https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/InputfieldImageExtra-settings.png)
 
 **Assign the new type to a field**
 
-!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/FieldSettings-ImageExtra.png(screenshot)!
+![Assign it](https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/FieldSettings-ImageExtra.png)
 
-!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/FieldSettings-ImageExtraLanguage.png(screenshot)!
+![Assign it](https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/FieldSettings-ImageExtraLanguage.png)
 
 **It's really important to confirm the change, because it may need database updates**
 
-!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/FieldSettings-confirm.png(screenshot)!
+![Confirm changes](https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/FieldSettings-confirm.png)
 
 **ImageExtra**
 
 Backend
 
-!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/ImageExtra-backend.png(screenshot)!
+![Backend Settings](https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/ImageExtra-backend.png)
 
 Here is a litte example how to access the new fields:
 
@@ -113,19 +113,19 @@ if (count($page->images)) {
 
 And the result in the frontend may look like this:
 
-!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/ImageExtra-frontend.png(screenshot)!
+![Frontend](https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/ImageExtra-frontend.png)
 
 **ImageExtraLanguage**
 
 Backend
 
-!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/ImageExtraLanguage-default-backend.png(screenshot)!
+![Backend](https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/ImageExtraLanguage-default-backend.png)
 
-!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/ImageExtraLanguage-other-backend.png(screenshot)!
+![Backend](https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/ImageExtraLanguage-other-backend.png)
 
 Frontend
 
 Depending on the selected language you will get a different output.  
 If you don't translate an field, you get the value of the default language (look at author).
 
-!https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/ImageExtraLanguage-frontend.png(screenshot)!
+![Language](https://github.com/justonestep/processwire-fieldtypeimageextra/blob/master/screens/ImageExtraLanguage-frontend.png)

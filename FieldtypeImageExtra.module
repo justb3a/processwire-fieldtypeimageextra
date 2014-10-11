@@ -263,7 +263,18 @@ class FieldtypeImageExtra extends FieldtypeImage {
    *
    */
   public function ___install() {
-    $this->modules->get('InputfieldImageExtra');
+    $module = 'InputfieldImageExtra';
+    $data = array(
+      'orientationField' => true,
+      'orientationValues' => 'left,right',
+      'titleField' => true,
+      'descriptionField' => true,
+      'linkField' => true,
+      'otherField' => ''
+    );
+
+    $this->modules->get($module);
+    $this->modules->saveModuleConfigData($module, $data);
   }
 
 }

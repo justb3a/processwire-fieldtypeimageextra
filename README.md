@@ -58,6 +58,7 @@ This values will be available in a dropdown list.
 This is no different than accessing the value of any other field.
 
 ```php
+  $image = $page->image->getRandom();
   echo $image->title;
   echo $pages->get($image->link)->url
 ```
@@ -65,6 +66,7 @@ This is no different than accessing the value of any other field.
 For use with [TemplateTwigReplace](http://modules.processwire.com/modules/template-twig-replace):
 
 ```twig
+  {% set image = page.images.getRandom() %}
   {{image.title}}
   {{pages.get(image.link).url}}
 ```

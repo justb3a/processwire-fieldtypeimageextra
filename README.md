@@ -1,10 +1,12 @@
-# ProcessWire Fieldtype Image Extra
+### ProcessWire 
+
+# Fieldtype Image Extra (Multi-languages)
 
 ## Overview:
 
 Extends Filetype Image. Adds description, title, link and orientation.
 
-Designed for use with ProcessWire 2.4
+Designed for use with ProcessWire 2.4/2.5
 [http://processwire.com](http://processwire.com)
 
 ## Installation
@@ -18,11 +20,15 @@ git clone https://github.com/justonestep/processwire-fieldtypeimageextra.git you
 2. Login to ProcessWire admin and click Modules. 
 3. Click "Check for new modules".
 4. Click "install" next to the new FieldtypeImageExtra module. 
-5. That's all - no settings are required but possiblea. 
+  If you need multi-language support, you have to install the FieldtypeImageExtraLanguage module.
+5. That's all - no settings are required but possible. 
 
-### You do not need all custom fields?
+### Define your custom fields
 
-The following fields are available:
+1. Login to ProcessWire admin and click Modules.
+2. Open `Images Extra Inputfield` Settings.
+
+The following fields are available by default:
 
 * orientation - image orientation
 * orientation values - values to use as classnames or identifiers for different image orientations
@@ -30,19 +36,18 @@ The following fields are available:
 * description - image description
 * link - image link to internal pages
 
-If you don't need all custom fields, you can easily disable them:
+If these fields are not enough for you, you can add any other field (for example _author_ and _location_)
+by writing it (separated by comma) in the field `otherField`.
 
-1. Login to ProcessWire admin and click Modules.
-2. Open `Images Extra Inputfield` Settings.
-3. Just disable the desired fields.
+If you don't need all custom fields, you can easily disable them.
 
-The only exception is `orientationValues`.
+One more exception is `orientationValues`.
 Here you can insert identifiers for classnames or similar separated by comma.
 This values will be available in a dropdown list.
 
 ## Usage
 
-1. Under Setup and Fields create a new field using type ImageExtra.
+1. Under Setup and Fields create a new field using type `ImageExtra` or `ImageExtraLanguage`.
 2. After entering the new field name and label, click Save.
 3. Configure it depending on your own needs.
 4. Save.
@@ -52,24 +57,75 @@ This values will be available in a dropdown list.
 
 This is no different than accessing the value of any other field.
 
-```
-	echo $img->title;
-	echo $pages->get($img->link)->url
+```php
+  $image = $page->image->getRandom();
+  echo $image->title;
+  echo $pages->get($image->link)->url
 ```
 
 For use with [TemplateTwigReplace](http://modules.processwire.com/modules/template-twig-replace):
 
-```
-	{{image.title}}
-	{{pages.get(image.link).url}}
+```twig
+  {% set image = page.images.getRandom() %}
+  {{image.title}}
+  {{pages.get(image.link).url}}
 ```
 
 ## Screenshots
 
 **Module `Images Extra Inputfield` Settings**
 
-![screenshot](screens/settings.png)
+![screenshot](screens/InputfieldImageExtra-settings.png)
 
-**Field Image Extra**
+**Assign the new type to a field**
 
-![screenshot](screens/field.png)
+![screenshot](screens/FieldSettings-ImageExtra.png)
+
+![screenshot](screens/FieldSettings-ImageExtraLanguage.png)
+
+**It's really important to confirm the change, because it may need database updates**
+
+![screenshot](screens/FieldSettings-confirm.png)
+
+**ImageExtra**
+
+Backend
+
+![screenshot](screens/ImageExtra-backend.png)
+
+Here is a litte example how to access the new fields:
+
+```php
+// if there are images, lets choose one to output in the sidebar
+if (count($page->images)) {
+  // if the page has images on it, grab one of them randomly...
+  $image = $page->images->getRandom();
+  // resize it to 400 pixels wide
+  $image = $image->width(400);
+  // output the image at the top of the sidebar
+  $sidebar = "<img src='$image->url' alt='$image->description' />" .
+    "<h3>$image->title</h3>" .
+    "<blockquote>$image->description</blockquote>" .
+    "<p>$image->author ($image->location)</p>" .
+    $page->sidebar;
+}
+```
+
+And the result in the frontend may look like this:
+
+![screenshot](screens/ImageExtra-frontend.png)
+
+**ImageExtraLanguage**
+
+Backend
+
+![screenshot](screens/ImageExtraLanguage-default-backend.png)
+
+![screenshot](screens/ImageExtraLanguage-other-backend.png)
+
+Frontend
+
+Depending on the selected language you will get a different output.  
+If you don't translate an field, you get the value of the default language (look at author).
+
+![screenshot](screens/ImageExtraLanguage-frontend.png)

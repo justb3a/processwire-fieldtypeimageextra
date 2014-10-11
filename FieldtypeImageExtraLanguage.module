@@ -1,0 +1,69 @@
+<?php
+
+/**
+ * ProcessWire Fieldtype Image Extra
+ *
+ * See README.md for usage instructions.
+ *
+ * ProcessWire 2.x
+ * Licensed under GNU/GPL v2, see LICENSE.TXT
+ *
+ * @author Tabea David <td@kf-interactive.com>
+ * @version 1.0.1
+ * @copyright Copyright (c) 2014 KF Interactive, www.kf-interactive.com, <info@kf-interactive.com>
+ * @see https://github.com/justonestep/processwire-fieldtypeimageextra
+ * @see http://www.processwire.com
+ *
+ */
+
+/**
+ * Class FieldtypeImageExtraLanguage
+ */
+class FieldtypeImageExtraLanguage extends FieldtypeImageExtra {
+
+  /**
+   * Retrieves module meta data
+   * Implementation of the Module interface
+   *
+   * @return array
+   * @see http://processwire.com/apigen/class-Module.html
+   */
+  public static function getModuleInfo() {
+    return array(
+      'title' => 'Images Extra Fieldtype (Multi-language)',
+      'version' => 101,
+      'summary' => 'Field that stores one or more GIF, JPG, or PNG images with additional meta informations (multi-language)',
+      'href' => 'https://github.com/justonestep/processwire-fieldtypeimageextra',
+    );
+  }
+
+  /**
+   * Return the DB schema used by this field's table
+   *
+   * @param Field $field
+   */
+  public function getDatabaseSchema(Field $field) {
+    $schema = parent::getDatabaseSchema($field);
+    $languageSupport = wire('modules')->get('LanguageSupport');
+
+    foreach ($this->getBasicFields() as $field => $fieldSchema) {
+      if ($field != 'link' && $field != 'orientation') {
+        foreach ($languageSupport->otherLanguagePageIDs as $languageID) {
+          $schema[$field . $languageID] = $schema[$field];
+          $schema['keys'][$field . $languageID] = "FULLTEXT KEY `{$field}{$languageID}` (`{$field}{$languageID}`)";
+        }
+      }
+    }
+
+    return $schema;
+  }
+
+  /**
+   * install - install module ImageExtraLanguageSupport as well
+   *
+   */
+  public function ___install() {
+    $this->modules->get('ImageExtraLanguageSupport');
+  }
+
+}

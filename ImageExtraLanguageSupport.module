@@ -1,0 +1,112 @@
+<?php
+
+/**
+ * ProcessWire Image Extra Language Support
+ *
+ * See README.md for usage instructions.
+ *
+ * ProcessWire 2.x
+ * Licensed under GNU/GPL v2, see LICENSE.TXT
+ *
+ * @author Tabea David <td@kf-interactive.com>
+ * @version 1.0.1
+ * @copyright Copyright (c) 2014 KF Interactive, www.kf-interactive.com, <info@kf-interactive.com>
+ * @see https://github.com/justonestep/processwire-fieldtypeimageextra
+ * @see http://www.processwire.com
+ *
+ */
+
+/**
+* Class ImageExtraLanguageSupport
+*/
+class ImageExtraLanguageSupport extends WireData implements Module {
+
+  /**
+   * Retrieves module meta data
+   * Implementation of the Module interface
+   *
+   * @return array
+   * @see http://processwire.com/apigen/class-Module.html
+   */
+  public static function getModuleInfo() {
+    return array(
+      'title' => 'Images Extra Fieldtype Language Support',
+      'version' => 101,
+      'summary' => 'Language Support for Fieldtype Images Extra',
+      'href' => 'https://github.com/justonestep/processwire-fieldtypeimageextra',
+      'singular' => true,
+      'autoload' => true,
+    );
+  }
+
+  /**
+   * Initialize the module
+   * add hook
+   *
+   */
+  public function init() {
+		$this->addHookAfter('Fieldtype::loadPageField', $this, 'renderLanguageSupport');
+  }
+
+  /**
+   * Hook renderLanguageSupport
+   *
+   * @param HookEvent $event
+   */
+  public function renderLanguageSupport(HookEvent $event) {
+    $page = $event->arguments[0];
+    $field = $event->arguments[1];
+    $value = $event->return;
+
+    // first check whether it is FieldtypeImageExtraLanguage
+    if ($field->type instanceof FieldtypeImageExtraLanguage && is_array($value)) {
+
+      // get the language of the user, handle all other languages
+      $user = $this->wire('user');
+      if (isset($user->language) && !empty($user->language)){
+        $languageID = $user->language->id;
+        $languages = $this->wire('languages');
+
+          // check whether it is not the default language
+          if ($languageID != $languages->get('default')->id) {
+            $value = $this->getLanguageSubstitution($value, $languageID);
+          }
+      }
+    }
+
+    $event->return = $value;
+  }
+
+  /**
+   * Hook getLanguageSubstitution
+   * get translations and assign them
+   *
+   * @param array $value
+   * @param int $languageID
+   * @return array
+   */
+  private function getLanguageSubstitution($value, $languageID) {
+    // loop through it - could have multiple images
+    foreach ($value as $key => $image) {
+      foreach ($image as $f => $v) {
+
+        // is it a multi-language field
+        if (preg_match('/([0-9])\w+/', $f)) {
+          $fLanguageID = (int)preg_replace('/([a-z])*([0-9]\w+)/', '$2', $f);
+
+          if ($languageID === $fLanguageID) {
+            $fBasic = preg_replace('/([0-9]\w+)/', '', $f);
+
+            if (!empty($v)) {
+              $value[$key][$fBasic] = $v;
+            }
+          }
+        }
+
+      }
+    }
+
+    return $value;
+  }
+
+}

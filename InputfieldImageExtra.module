@@ -1,16 +1,16 @@
 <?php
 
 /**
- * ProcessWire Inputfield Image Extra
+ * ProcessWire Fieldtype Image Extra
  *
  * See README.md for usage instructions.
  *
  * ProcessWire 2.x
  * Licensed under GNU/GPL v2, see LICENSE.TXT
  *
- * @author Ryan Cramer, Tabea David <info@justonestep.de>
- * @version 1.0.0
- * @copyright Copyright (c) 2014
+ * @author Tabea David <td@kf-interactive.com>
+ * @version 1.0.1
+ * @copyright Copyright (c) 2014 KF Interactive, www.kf-interactive.com, <info@kf-interactive.com>
  * @see https://github.com/justonestep/processwire-fieldtypeimageextra
  * @see http://www.processwire.com
  * @see http://www.ryancramer.com
@@ -31,7 +31,8 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
     'orientationValues' => 'left,right',
     'titleField' => true,
     'descriptionField' => true,
-    'linkField' => true
+    'linkField' => true,
+    'otherField' => ''
   );
 
 
@@ -46,7 +47,7 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
   public static function getModuleInfo() {
     return array(
       'title' => 'Images Extra Inputfield',
-      'version' => 100,
+      'version' => 101,
       'summary' => 'One or more image uploads (sortable) with extra fields',
       'href' => 'https://github.com/justonestep/processwire-fieldtypeimageextra',
     );
@@ -76,9 +77,9 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
         'columnWidth' => 25
       ),
       'orientationValues' => array(
-      'type' => 'InputfieldText',
-      'description' => 'Values for Image Orientation Select Field' . PHP_EOL . '(comma-separated list)',
-      'size' => 45,
+        'type' => 'InputfieldText',
+        'description' => 'Values for Image Orientation Select Field' . PHP_EOL . '(comma-separated list)',
+        'size' => 45,
         'placeholder' => 'left,right',
         'columnWidth' => 25
       ),
@@ -86,19 +87,26 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
         'type' => 'InputfieldCheckbox',
         'description' => 'Enable Title Input Field' . PHP_EOL . '(activate the checkbox to enable field `title`)',
         'checked' => empty($data['titleField']) ? '' : 'checked',
-        'columnWidth' => 50
+        'columnWidth' => 25
       ),
       'descriptionField' => array(
         'type' => 'InputfieldCheckbox',
         'description' => 'Enable Description Text Field' . PHP_EOL . '(activate the checkbox to enable field `description`)',
         'checked' => empty($data['descriptionField']) ? '' : 'checked',
-        'columnWidth' => 50
+        'columnWidth' => 25
       ),
       'linkField' => array(
         'type' => 'InputfieldCheckbox',
         'description' => 'Enable Choose-Link Field' . PHP_EOL . '(activate the checkbox to enable field `link`)',
         'checked' => empty($data['linkField']) ? '' : 'checked',
-        'columnWidth' => 50
+        'columnWidth' => 25
+      ),
+      'otherField' => array(
+        'type' => 'InputfieldText',
+        'description' => 'Add other fields as simple inputs' . PHP_EOL . '(comma-separated list)',
+        'size' => 80,
+        'placeholder' => '',
+        'columnWidth' => 25
       ),
     );
 
@@ -161,6 +169,10 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
       }
     }
 
+    foreach (array('scripts' => '.js', 'styles' => '.css') as $type => $fileExtension) {
+      $this->config->{$type}->add($this->config->urls->InputfieldImageExtra . 'ImageExtraLanguage' . $fileExtension);
+    }
+
     return parent::___render();
   }
 
@@ -168,62 +180,230 @@ class InputfieldImageExtra extends InputfieldImage implements ConfigurableModule
    * renderItemDescriptionField - build html structure for the backend
    *
    * @param Pagefile $pagefile
-   * @param string $id
+   * @param string $id - field name
    * @param int $n
    */
   protected function renderItemDescriptionField(Pagefile $pagefile, $id, $n) {
-    $out = '';
+    // fieldname plus `_hash`
+    $field = str_replace('_' . $pagefile->hash, '', $id);
+    // repeater image
+    $field = preg_replace('/(_)(repeater)([0-9]\w+)/', '', $field);
+
+    // is it a language field
+    if ($this->fields->get($field)->type instanceof FieldtypeImageExtraLanguage) {
+      $hasLanguage = true;
+    } else {
+      $hasLanguage = false;
+    }
+
+    $out = array();
+    $languageIDs = $this->getLanguages();
+    $languages = $this->wire('languages');
 
     foreach ($this->customFields as $field) {
       $for = $field['name'] . '_' . $id;
       $label = ucfirst($field['label']);
       $name = $field['name'];
+      $value = htmlspecialchars($pagefile->{$name}, ENT_QUOTES, "UTF-8");
 
-      if (empty($this->data[$name . 'Field'])) {
-        continue;
+      // it is a language field?
+      if (preg_match('/([0-9])\w+/', $name)) {
+        $labelSplit = preg_replace('/([0-9]\w+)/', ',$1', $label);
+        $labelSplitted = explode(',', $labelSplit);
+        $fieldLanguage = $labelSplitted[1];
+        $label = $labelSplitted[0] . ' ' . $languageIDs[$fieldLanguage];
+        $labelLanguage = $languages->get($fieldLanguage)->title;
+        $basicField = preg_replace('/([0-9]\w+)/', '', $name);
+      } else {
+        $basicField = $name;
+        $fieldLanguage = $languages->get('default')->id;
+        $labelLanguage = $languages->get('default')->title;
       }
 
-      switch ($field['name']) {
 
-        case 'orientation':
-          $out .= "<label for='$for' class='infield'>$label</label>";
-          $out .= "<select name='$for' size='1'>";
-
-          foreach (explode(',', $this->data['orientationValues']) as $type) {
-            $selected = $pagefile->{$field['name']} === $type ? 'selected' : '';
-            $out .= "<option value='$type' $selected>$type</option>";
-          }
-
-          $out .= "</select><br /><br />";
-        break;
-
-        case 'title':
-          $value = htmlspecialchars($pagefile->{$field['name']}, ENT_QUOTES, "UTF-8");
-          $out .= "<label for='$for' class='InputfieldFileDescription infield'>$label";
-          $out .= "<input type='text' name='$for' id='$for' value='$value' />";
-          $out .= "</label><br />";
-        break;
-
+      // assign html output depending on field
+      switch ($name) {
+        // description field, textarea
         case 'description':
-          $value = htmlspecialchars($pagefile->{$field['name']}, ENT_QUOTES, "UTF-8");
-          $out .= "<label for='$for' class='InputfieldFileDescription infield'>$label";
-          $out .= "<textarea id='$for' name='$for' rows='{$this->descriptionRows}'>$value</textarea>";
-          $out .= "</label><br />";
+          $out[$basicField] = $this->getHtmlWrapper($label);
+          $out[$basicField] .= $this->getHtmlContent($fieldLanguage, $hasLanguage, $for, $labelLanguage);
+          $out[$basicField] .= $this->getHtmlField($for, $value, 'textarea');
         break;
 
-        case 'link':
-          $value = (int)$pagefile->$name;
+        // descriptions field multi-language, textarea
+        case (preg_match('/description.*/', $name) ? true : false):
+          $out[$basicField] .= $this->getHtmlContent($fieldLanguage, $hasLanguage, $for, $labelLanguage);
+          $out[$basicField] .= $this->getHtmlField($for, $value, 'textarea');
+        break;
 
-          $field = $this->modules->get('InputfieldPageListSelect');
-          $field->startLabel = $this->_('Choose Link');
-          $field->setAttribute('name+id', $for);
-          $field->attr('value', $value);
-          $out .= $field->render();
+        // orientation field, select
+        case 'orientation':
+          $classes = array(
+            'wrap' => 'InputfieldImageExtraItem InputfieldImageExtraItem__inline InputfieldImageExtraItem__inline-first',
+            'content' => 'InputfieldContent InputfieldContentSimple'
+          );
+          $params = array(
+            'values' => $this->data['orientationValues'],
+            'name' => $pagefile->{$name}
+          );
+          $out[$basicField] = $this->getHtmlWrapper($label, $classes);
+          $out[$basicField] .= $this->getHtmlField($for, $value, 'select', $params);
+        break;
+
+        // link field. page list select
+        case 'link':
+          $classes = array(
+            'wrap' => 'InputfieldImageExtraItem InputfieldImageExtraItem__inline',
+            'content' => 'InputfieldContent InputfieldContentSimple'
+          );
+          $out[$basicField] = $this->getHtmlWrapper($label, $classes);
+          $out[$basicField] .= $this->getHtmlField($for, (int)$pagefile->$name, 'link');
+        break;
+
+        // title fields multi-language, input
+        // other fields multi-language, input
+        case (preg_match('/([0-9])\w+/', $name) ? true : false):
+          $out[$basicField] .= $this->getHtmlContent($fieldLanguage, $hasLanguage, $for, $labelLanguage);
+          $out[$basicField] .= $this->getHtmlField($for, $value);
+        break;
+
+        // title field, input
+        // other fields, input
+        default:
+          $out[$basicField] = $this->getHtmlWrapper($label);
+          $out[$basicField] .= $this->getHtmlContent($fieldLanguage, $hasLanguage, $for, $labelLanguage);
+          $out[$basicField] .= $this->getHtmlField($for, $value);
         break;
       }
     }
 
-    return $out;
+    foreach ($out as $f => $o) {
+      $out[$f] = "$o</div></div>";
+    }
+
+    return $this->getHtmlWrapperClosing($out, $hasLanguage);
+  }
+
+  /**
+   * getHtmlWrapper
+   *
+   * @param string $label
+   * @param array $specialClasses
+   * @return string
+   */
+  private function getHtmlWrapper($label, $specialClasses = array()) {
+    $classes = array(
+      'wrap' => 'InputfieldImageExtraItem',
+      'content' => 'InputfieldContent'
+    );
+
+    if (is_array($specialClasses) && !empty($specialClasses)) {
+        $classes = array_merge($classes, $specialClasses);
+    }
+
+    $output = "<div class='{$classes['wrap']}' id='wrap_inputimageextra_$label'>";
+    $output .= "<h3 class='InputfieldImageExtraHeader'>$label</h3>";
+    $output .= "<div class='{$classes['content']}'>";
+
+    return $output;
+  }
+
+  /**
+   * getHtmlWrapper
+   *
+   * @param int $languageID
+   * @param boolean $language
+   * @param string $for
+   * @param string $label
+   * @return string
+   */
+  private function getHtmlContent($languageID, $language, $for, $label) {
+    $output = "<div class='LanguageSupport' data-language='{$languageID}'>";
+
+    if ($language) {
+      $output .= "<label for='$for' class='LanguageSupportLabel detail'>$label</label>";
+    }
+
+    return $output;
+  }
+
+  /**
+   * getHtmlWrapper
+   *
+   * @param string $for
+   * @param string $value
+   * @param string $type
+   * @param array $params
+   * @return string
+   */
+  private function getHtmlField($for, $value, $type = 'input', $params = array()) {
+    switch($type) {
+      case 'textarea':
+        $output = "<textarea id='$for' name='$for' rows='3'>$value</textarea></div>";
+        break;
+
+      case 'select':
+        $output = "<select name='$for' size='1'>";
+
+          foreach (explode(',', $params['values']) as $val) {
+            $selected = $params['name'] === $val ? 'selected' : '';
+            $output .= "<option value='$val' $selected>$val</option>";
+          }
+
+        $output .= "</select>";
+        break;
+
+      case 'link':
+        $field = $this->modules->get('InputfieldPageListSelect');
+        $field->startLabel = $this->_('Choose Link');
+        $field->setAttribute('name+id', $for);
+        $field->attr('value', $value);
+        $output = $field->render();
+        break;
+
+      case 'input':
+        $output = "<input type='text' name='$for' id='$for' value='$value' class='InputfieldMaxWidth' /></div>";
+        break;
+    }
+
+    return $output;
+  }
+
+  /**
+   * getHtmlWrapper
+   *
+   * @param array $out
+   * @param boolean $hasLanguage
+   * @return string
+   */
+  private function getHtmlWrapperClosing($out, $hasLanguage) {
+    $output = implode('', $out);
+
+    if ($hasLanguage === false) {
+      $output = "<div class='InputfieldImageExtraItem__nolanguage'>$output</div>";
+    }
+
+    return $output;
+  }
+
+  /**
+   * getLanguages - get other languages (id and title)
+   *
+   */
+  public function getLanguages() {
+    $languageIDs = array();
+    $languageSupport = wire('modules')->get('LanguageSupport');
+    foreach ($languageSupport->otherLanguagePageIDs as $languageID) {
+      $language = $this->languages->get($languageID);
+      $title = $language->title->getLanguageValue($language);
+      if (empty($title)) {
+        $title = $language->title->getLanguageValue($this->languages->get('default'));
+      }
+
+      $languageIDs[$languageID] = $title;
+    }
+
+    return $languageIDs;
   }
 
   /**

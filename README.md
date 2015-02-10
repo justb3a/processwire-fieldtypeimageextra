@@ -1,3 +1,11 @@
+* * *
+
+## This module is obsolete and will not be developed any further. ##
+
+## Please use the [ImageExtra](https://github.com/justonestep/processwire-imageextra) module instead. ##
+
+* * *
+
 ### ProcessWire 
 
 # Fieldtype Image Extra (Multi-languages)

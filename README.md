@@ -1,3 +1,7 @@
+# WARNING: This repository is no longer maintained :warning:
+
+> This repository will not be updated. The repository will be kept available in read-only mode.
+
 * * *
 
 ### This module is obsolete and will not be developed any further. Please use the [ImageExtra](https://github.com/justonestep/processwire-imageextra) module instead. ###
